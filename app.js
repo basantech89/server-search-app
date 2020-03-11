@@ -29,7 +29,17 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected correctly to the server'))
   .catch((error) => console.log(error));
 
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
+if (process.env.NODE_ENV !== 'development') {
+  app.use(express.static("client/build"));
+  app.get("/*", (req, res) => res.sendFile(path.join(__dirname, "./client/build/index.html")));
+} else {
+  app.use(express.static(path.join(__dirname, '/client/public')));
+  app.get("/", function(req, res) {
+    res.sendFile(path.join(__dirname, "./client/public/index.html"));
+  });
+}
+
 app.use('/users', usersRouter);
 app.use('/predictions', predictionRouter);
 app.use('/companies', companyRouter);
